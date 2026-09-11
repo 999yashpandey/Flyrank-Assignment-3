@@ -1,0 +1,141 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Task API",
+    "version": "1.0",
+    "description": "In-memory CRUD API for a to-do list. No database yet — data resets on restart."
+  },
+  "servers": [{ "url": "http://localhost:3000" }],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "API info",
+        "description": "Describes the API and lists its top-level endpoints.",
+        "responses": {
+          "200": { "description": "API info" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Returns ok if the server is alive.",
+        "responses": {
+          "200": { "description": "Server is healthy" }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "summary": "List all tasks",
+        "responses": {
+          "200": {
+            "description": "Array of tasks",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Task" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TaskInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Task" } }
+            }
+          },
+          "400": { "description": "Missing or invalid title" }
+        }
+      }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "summary": "Get one task",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "The task",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Task" } }
+            }
+          },
+          "404": { "description": "Task not found" }
+        }
+      },
+      "put": {
+        "summary": "Update a task",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TaskUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated task",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Task" } }
+            }
+          },
+          "400": { "description": "Invalid body" },
+          "404": { "description": "Task not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a task",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Deleted, no content" },
+          "404": { "description": "Task not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "title": { "type": "string", "example": "Buy milk" },
+          "done": { "type": "boolean", "example": false }
+        }
+      },
+      "TaskInput": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string", "example": "Buy milk" }
+        }
+      },
+      "TaskUpdate": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "example": "Buy oat milk" },
+          "done": { "type": "boolean", "example": true }
+        }
+      }
+    }
+  }
+}
